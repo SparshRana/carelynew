@@ -23,7 +23,7 @@ function yymmdd(value: string) {
 function parseDigitalLink(raw: string) {
   try {
     const url = new URL(raw);
-    const parts = decodeURIComponent(url.pathname).split('/').filter(Boolean);
+    const parts = url.pathname.split('/').filter(Boolean).map(part=>decodeURIComponent(part));
     const values: Record<string, string> = {};
     for (let i = 0; i + 1 < parts.length; i += 2) {
       if (['01', '10', '11', '17', '21'].includes(parts[i])) values[parts[i]] = parts[i + 1];
@@ -65,8 +65,17 @@ export function parseMedicineBarcode(rawValue: string, format = 'UNKNOWN'): Pars
     }
   }
 
+  // UPC-E's eight digits are compressed UPC-A, not EAN-8.
+  let retail = raw;
+  if (format === 'UPC_E' && /^[01]\d{7}$/.test(raw)) {
+    const [ns,a,b,c,d,e,f,check] = raw;
+    retail = '012'.includes(f) ? ns+a+b+f+'0000'+c+d+e+check
+      : f === '3' ? ns+a+b+c+'00000'+d+e+check
+      : f === '4' ? ns+a+b+c+d+'00000'+e+check
+      : ns+a+b+c+d+e+'0000'+f+check;
+  }
   let gtin = values['01'] || null;
-  if (!gtin && /^\d{8}$|^\d{12,14}$/.test(raw)) gtin = gtin14(raw);
+  if (!gtin && /^\d{8}$|^\d{12,14}$/.test(retail)) gtin = gtin14(retail);
   if (gtin && !/^\d{14}$/.test(gtin)) gtin = null;
   if(gtin){const sum=[...gtin.slice(0,-1)].reverse().reduce((total,digit,index)=>total+Number(digit)*(index%2===0?3:1),0);if((10-sum%10)%10!==Number(gtin.slice(-1)))gtin=null;}
 

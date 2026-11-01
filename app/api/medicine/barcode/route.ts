@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import {parseMedicineBarcode} from '@/lib/barcode';
 import { cachedBarcode, saveBarcode } from '@/lib/catalog-db';
 
 export const runtime = 'nodejs';
@@ -8,7 +9,7 @@ export async function POST(request: Request) {
   try { body = await request.json() as typeof body; } catch { return NextResponse.json({ error: 'invalid_request' }, { status: 400 }); }
   if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'invalid_request' }, { status: 400 });
   if ((body.batch != null && (typeof body.batch !== 'string' || body.batch.length > 150)) || (body.expiry != null && (typeof body.expiry !== 'string' || body.expiry.length > 32))) return NextResponse.json({ error: 'invalid_pack_fields' }, { status: 400 });
-  const gtin = String(body.gtin || '');
+  const gtin = parseMedicineBarcode(String(body.gtin || '')).gtin || '';
   if (!/^\d{14}$/.test(gtin)) return NextResponse.json({ found: false, reason: 'no_product_identifier', gtin: null });
 
   try {
