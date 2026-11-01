@@ -27,6 +27,8 @@ export default function Services({mode,items,onRestore}:{mode:ServiceMode;items:
  const [password,setPassword]=useState('');
  const [message,setMessage]=useState('');
  const [busy,setBusy]=useState(false);
+ const [watchEnabled,setWatchEnabled]=useState(false);
+ const [watchSummary,setWatchSummary]=useState('');
  const [recipient,setRecipient]=useState('');
  const [grants,setGrants]=useState<Grant[]>([]);
  const [notes,setNotes]=useState<Note[]>([]);
@@ -89,6 +91,16 @@ export default function Services({mode,items,onRestore}:{mode:ServiceMode;items:
   return()=>{active=false;clearInterval(timer);window.removeEventListener('focus',focus);document.removeEventListener('visibilitychange',focus);};
  },[mode,session?.user.id]);
 
+ async function checkBatches(){
+  try{const response=await fetch('/api/watch',{method:'POST',headers:{Authorization:`Bearer ${await token()}`},signal:AbortSignal.timeout(60000)});const result=await response.json() as {error?:string;label:string;checked:number;needsDetails:number;newNotifications:number;recordCount:number;checkedAt:string;snapshotAt:string;liveAvailable:boolean};if(!response.ok)throw Error(result.error||'Cabinet check failed.');setWatchSummary(`${result.label}. ${result.checked} saved medicines checked against ${result.recordCount} records. ${result.needsDetails} entries need name, manufacturer or batch details. ${result.newNotifications} new inbox messages. Historical snapshot: ${result.snapshotAt}. Checked: ${new Date(result.checkedAt).toLocaleString()}.${result.liveAvailable?'':' Live refresh unavailable; historical matches may still appear.'}`);}catch(e){setWatchSummary(e instanceof Error?e.message:'Cabinet check unavailable.');}
+ }
+ useEffect(()=>{
+  if(!session||!watchEnabled)return;
+  let running=false;const check=async()=>{if(document.hidden||running)return;running=true;try{await checkBatches();}finally{running=false;}};
+  void check();const timer=setInterval(()=>void check(),15*60*1000);
+  return()=>clearInterval(timer);
+ },[session?.user.id,watchEnabled]);
+
  const account=<div className="service-account">
   <div className="service-inline-heading"><UserRound size={18}/><strong>{t("Your account")}</strong><span className={'service-status '+(configured?'ready':'setup')}>{t(configured?'Keys provided':'Setup needed')}</span></div>
   {!configured?<p>{t("Cloud accounts and family sharing need your Supabase URL and public anon key. You can still scan, search, and save medicines locally without either key.")}</p>:
@@ -118,6 +130,11 @@ export default function Services({mode,items,onRestore}:{mode:ServiceMode;items:
   <div className="service-panels">
    <article className="service-panel">{account}</article>
    {mode==='cabinet'&&<article className="service-panel">
+    <h3>Watch your saved batches</h3><p>Check medicines already saved to your cloud cabinet against published CDSCO quality alerts. Exact name, manufacturer and batch matches create a message in your family inbox. Family members need an enabled permission to read it.</p>
+    <button disabled={!session||busy} onClick={()=>void run(checkBatches)}>Check saved cloud batches now</button>
+    <label className="service-grant"><input type="checkbox" checked={watchEnabled} disabled={!session} onChange={e=>setWatchEnabled(e.target.checked)}/> Check every 15 minutes while this page is open</label>
+    <p className="service-muted">Save medicine changes to cloud first. Checks stop when this page closes. This does not send push, SMS or email. No matching alert does not certify safety or authenticity.</p>
+    <p role="status" className="service-message">{watchSummary}</p>
     <h3>{t("Cloud cabinet")}</h3><p>{t("Save or retrieve personal medicine entries when signed in. Cloud entries are merged with this device. Review conflicts before confirming a save.")}</p>
     <div className="service-actions"><button disabled={!session||busy} onClick={()=>void run(async()=>{const rows=await db<Array<{medicines:Medicine[];revision:number}>>('carely_cabinets?select=medicines,revision');if(!rows.length){setMessage('No cloud cabinet saved yet.');return;}const remote=restore(JSON.stringify({items:rows[0].medicines})).items;const merged=mergeCabinets(latestItems.current,remote);onRestore(merged.items);setCloudReview(null);setMessage(`Cloud entries merged. ${merged.conflicts} conflicting entries kept the device details; the cloud copy is unchanged.`);})}>{t("Load cloud cabinet")}</button>
     <button className="secondary" disabled={!session||busy} onClick={()=>void run(async()=>{const rows=await db<Array<{medicines:Medicine[];revision:number}>>('carely_cabinets?select=medicines,revision');const remote=restore(JSON.stringify({items:rows[0]?.medicines||[]})).items;const merged=mergeCabinets(latestItems.current,remote);setCloudReview({...merged,device:JSON.stringify(latestItems.current),revision:rows[0]?.revision||0});})}>{t("Save to cloud")}</button></div>
@@ -125,7 +142,7 @@ export default function Services({mode,items,onRestore}:{mode:ServiceMode;items:
     <p className="service-muted"><LockKeyhole size={16}/>{' '}{t("Only your account can access your cabinet. Family grants do not share cabinet records.")}</p>
    </article>}
    {mode==='family'&&<article className="service-panel">
-    <h3>{t("Family permissions")}</h3><p>{t("Grant access to a signed-up family member by email, revoke it anytime, and write messages to the in-app inbox. This does not send SMS, WhatsApp, push or automatic drug alerts.")}</p>
+    <h3>{t("Family permissions")}</h3><p>{t("Grant access to a signed-up family member by email, revoke it anytime, and write messages to the in-app inbox. Messages stay in this inbox. Optional cabinet checks run only while Carely is open; no SMS, WhatsApp or push messages are sent.")}</p>
     <form className="service-form" onSubmit={e=>{e.preventDefault();void run(async()=>{await db('carely_family?on_conflict=owner_id,recipient_email','POST',{owner_id:session!.user.id,recipient_email:recipient.trim().toLowerCase(),enabled:true});setRecipient('');await refreshFamily();setMessage('Permission saved. Ask your family member to open their shared inbox.');})}}>
      <label>{t("Family member’s email")}<input type="email" required value={recipient} onChange={e=>setRecipient(e.target.value)} placeholder={t("family@example.com")}/></label><button disabled={!session||busy}>{t("Grant access")}</button>
     </form>
