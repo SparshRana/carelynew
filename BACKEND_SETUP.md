@@ -26,3 +26,27 @@ AI keys, live barcode catalogue providers and map/location providers are not ena
 ## Checks
 
 Run `pnpm test`, `pnpm render:build` and `pnpm build` from the application directory. The isolated SQL verifier in `verification/sql-check` checks the actual SQL using synthetic identities; it is not a substitute for the two-account acceptance test on your configured Supabase project.
+
+## Current hosted website and remaining activation
+
+Website: https://carely-family-medicine.sparsh-rana-ug26.chatgpt.site (owner-private access).
+
+Verified GitHub checks: https://github.com/SparshRana/carelynew/actions/runs/41303679728 — dependency installation, 48 tests, production build and isolated SQL security checks passed.
+
+### Supabase handoff
+
+Create the project at https://supabase.com/dashboard and apply the complete schema from this repository. Set the Authentication Site URL to the hosted website above. Supply only the project URL and public anon key for configuration. Keep the database password and secret/service-role keys private. No Supabase service is provisioned by this repository or by GitHub Actions.
+
+### Barcode lookup handoff
+
+The existing server adapter expects OPENMRP_API_KEY as a private runtime secret. Obtain provider access first and confirm that its contract and medicine coverage fit your actual packs; do not commit the key to GitHub. Other providers require their own adapter and access agreement. A provider must be tested using real product codes before claiming coverage. Ordinary product identifiers do not imply batch, expiry, authenticity or complete supply-chain history.
+
+### Go-live acceptance
+
+- Configure Supabase public settings at build time and runtime, then rebuild the hosted app.
+- Confirm two accounts; verify cabinet save/load, isolation, family message permission and revocation against the live project.
+- Configure a barcode provider secret privately; verify successful identification and an unknown-code result with physical packs.
+- Verify camera permission on an HTTPS mobile device and photo decoding with a clear supported barcode.
+- Keep AI integration deferred. Map/location provider configuration is also pending.
+
+These steps are pending external account configuration; passing CI does not certify live provider access or universal medicine coverage.
