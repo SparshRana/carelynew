@@ -1,0 +1,33 @@
+{
+  "tests": {
+    "passed": 44,
+    "failed": 0,
+    "command": "pnpm test"
+  },
+  "productionBuilds": {
+    "nextWebpack": "passed",
+    "portableVinext": "passed"
+  },
+  "browserChecks": {
+    "desktopSlidingStory": "Three scenes verified with arrows/progress controls and observed horizontal transform",
+    "mobile": "375px CSS viewport: document scrollWidth 375px; native carousel active; drawer scrollWidth equals clientWidth",
+    "themes": "Light and dark home/story screens inspected",
+    "language": "English and Hindi copy inspected; Hindi document language and no page overflow verified",
+    "keyboard": "FAQ toggles with Enter; focus indicators and semantic controls retained",
+    "demo": "Dad samples load; simulation flags DEMO-892 only; DEMO-893 remains neutral; all three safety cards open",
+    "offline": "With server stopped, current redesigned shell and word-emphasis headline reload correctly; no console errors observed",
+    "assets": "Both locally served original JPEGs loaded successfully"
+  },
+  "preserved": {
+    "protectedFilesCompared": 28,
+    "changedFiles": [],
+    "scope": "lib/, data/, app/api/ compared with previous offline source ZIP"
+  },
+  "cacheRegression": "Added a test that prevents navigation fallback from selecting an older release through a global cache lookup. Current cache is selected explicitly.",
+  "verificationLimits": [
+    "OS reduced-motion preference was not toggled; motion guards and native carousel fallback are implemented.",
+    "No new camera hardware test was performed for this visual redesign; decoding, medical-data limitations and local Hindi voice requirements remain documented in OFFLINE_DEMO.md."
+  ],
+  "artwork": "Original AI-generated artwork, encoded locally as JPEG; no reference-site assets copied",
+  "preview": "Local only; no public deployment performed"
+}

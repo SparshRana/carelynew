@@ -1,0 +1,40 @@
+{
+  "appearance": "Light-only sky-blue; dark toggle and automatic system dark mode removed",
+  "tests": {
+    "passed": 46,
+    "failed": 0
+  },
+  "builds": {
+    "Next Webpack production": "passed",
+    "portable Vinext production": "passed"
+  },
+  "browserChecks": [
+    "Desktop scene selection changes phone screen, character, text and backdrop together",
+    "375px viewport has no horizontal overflow; mobile scene controls select the requested scene",
+    "New sample button opens exactly three existing safety cards",
+    "No theme toggle present; document theme remains light",
+    "No console errors observed in checked flows"
+  ],
+  "artwork": {
+    "format": "WebP with alpha",
+    "files": [
+      "grandmother.webp",
+      "daughter.webp",
+      "otter.webp"
+    ],
+    "totalBytes": 682488
+  },
+  "preservedBusinessFiles": {
+    "compared": 28,
+    "changed": [
+      "lib/theme.ts (intentional light-only setting)"
+    ],
+    "APIDataMatchingStorage": "unchanged"
+  },
+  "notes": [
+    "Original layered 3D-style artwork, not rigged 3D characters",
+    "Desktop scroll timeline; mobile swipe/arrow controls; reduced-motion static selectable fallback",
+    "Actual OS reduced-motion setting was not toggled during QA",
+    "Optional AI/cloud and offline Hindi voice requirements remain unchanged"
+  ]
+}

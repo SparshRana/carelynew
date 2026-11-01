@@ -1,0 +1,34 @@
+{
+  "verified": "2026-10-30",
+  "tests": {
+    "command": "pnpm test",
+    "passed": 43,
+    "failed": 0
+  },
+  "builds": {
+    "pnpm run render:build": "passed (Next.js Webpack production)",
+    "pnpm run build": "passed (portable vinext production)"
+  },
+  "browserChecks": [
+    "Demo cabinet has three separate fictional entries",
+    "Simulation affects Dad Pantofix DEMO-892 only; DEMO-893 and MT-104 neutral",
+    "One unread demo notification; fictional caregiver preview",
+    "Reset restores neutral sample state",
+    "Real Alzomac-0.5 batch 60098 displays original official dissolution finding and source",
+    "Local Pantoprazole search displays curated formulation information and illustrative price comparison",
+    "Name-only manual entry saves and shows Details need confirmation",
+    "Exactly three safety cards; 375px viewport and drawer have no horizontal overflow",
+    "Light and dark themes render",
+    "Cached app reload and simulation work with local server stopped",
+    "GS1 QR test image decodes GTIN 08901234567890, batch DEMO-892 and expiry 2027-12-31",
+    "No console errors observed in checked flows"
+  ],
+  "limitations": [
+    "Installed local Hindi voice missing in test browser: transcript and graceful fallback verified; audible playback needs a suitable device",
+    "Prices are illustrative, not verified current government MRPs",
+    "ACNEMOIST batch 2200388 is absent from bundled snapshot and is not labelled a verified alert",
+    "Camera hardware and OS permission behavior require testing on presentation device",
+    "One ZXing decoder warning occurred while trying formats; QR decoding completed successfully",
+    "Offline cache requires initial load from localhost or HTTPS; optional connected features outside Demo Mode retain their provider requirements"
+  ]
+}

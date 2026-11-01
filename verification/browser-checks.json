@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-30",
+  "webgl": "ready",
+  "capsuleFrameImagesDiffer": true,
+  "cardHover": {
+    "rxDegrees": 2.1479937255637145,
+    "ryDegrees": -1.3769933114255704,
+    "widthBefore": 400,
+    "widthAfter": 400,
+    "heightBefore": 332,
+    "heightAfter": 332,
+    "resetOnLeave": true
+  },
+  "localBrowser": {
+    "twoOwnersKept": true,
+    "profileFilteredCount": 1,
+    "reloadKeptEntries": true,
+    "lastCheckedUpdated": true,
+    "hindiControls": true,
+    "qrPhotoDecodedBatch": "60098",
+    "temporaryQaEntriesRemoved": true
+  },
+  "viewports": [
+    {
+      "width": 375,
+      "documentWidth": 375
+    },
+    {
+      "width": 768,
+      "documentWidth": 768
+    }
+  ],
+  "notes": [
+    "No console errors in motion checks. ZXing logged nonfatal format-trial warnings during image decoding; QR decoding still succeeded.",
+    "Operating-system reduced-motion preference was not changed.",
+    "Real camera hardware and owner-provided service credentials remain acceptance requirements."
+  ]
+}

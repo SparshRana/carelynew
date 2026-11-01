@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: carely
+    runtime: node
+    plan: free
+    buildCommand: corepack pnpm install --frozen-lockfile && pnpm render:build
+    startCommand: pnpm render:start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 22.13.0
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: carely-db
+          property: connectionString
+databases:
+  - name: carely-db
+    databaseName: carely
+    user: carely
+    plan: free
+    postgresMajorVersion: "16"

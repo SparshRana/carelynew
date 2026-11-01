@@ -1,0 +1,10 @@
+import {NextResponse} from 'next/server';
+import {requireAccount,reserveAiUsage} from '@/lib/service-auth';
+export const runtime='nodejs';
+export async function POST(request:Request){
+ if(!await requireAccount(request))return NextResponse.json({error:'Sign in to use the AI assistant.'},{status:401});
+ if(!process.env.OPENAI_API_KEY)return NextResponse.json({error:'AI is not configured. Add OPENAI_API_KEY on the server.'},{status:503});
+ try{const b=await request.json() as {question?:unknown};if(typeof b.question!=='string'||!b.question.trim()||b.question.length>1500)return NextResponse.json({error:'Enter a question under 1,500 characters.'},{status:400});
+const quota=await reserveAiUsage(request,'chat');if(quota!=='allowed')return NextResponse.json({error:quota==='limited'?'Your AI usage limit has been reached. Please try again later.':'Usage safeguards are not configured. Run the current Supabase schema.'},{status:quota==='limited'?429:503,headers:quota==='limited'?{'Retry-After':'60'}:{}});
+ const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{Authorization:`Bearer ${process.env.OPENAI_API_KEY}`,'Content-Type':'application/json'},body:JSON.stringify({model:process.env.OPENAI_CHAT_MODEL||'gpt-4o-mini',max_tokens:500,messages:[{role:'system',content:'You are Carely, a medicine information assistant. Answer in the user language, including Hindi. You have NO live recall data or patient records in this conversation. Never claim a product or batch is safe, authentic, recalled, or prescribe doses. Explain general terms and how to consult a pharmacist. State uncertainty. For urgent symptoms advise immediate medical care. Do not invent citations. Be concise.'},{role:'user',content:b.question}]}),signal:AbortSignal.timeout(25000)});if(!r.ok)throw Error();const d=await r.json() as {choices?:Array<{message?:{content?:string}} >};return NextResponse.json({answer:d.choices?.[0]?.message?.content||'No answer returned.'});}catch{return NextResponse.json({error:'The AI service could not answer. Please try again later.'},{status:502});}
+}
