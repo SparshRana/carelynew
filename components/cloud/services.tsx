@@ -15,7 +15,7 @@ type Grant={id:string;owner_id:string;recipient_email:string;enabled:boolean};
 type Note={id:string;body:string;created_at:string};
 type Status={supabase:boolean;ai:boolean;barcodeLookup:boolean;indiaAlerts:string};
 const base=process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anon=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const anon=(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 const NSQ_URL='https://cdscoonline.gov.in/CDSCO/viewPublicNSQDrug';
 const NOTICES_URL='https://cdsco.gov.in/opencms/opencms/en/Alerts/';
 

@@ -3,7 +3,7 @@ const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const reply=(body:unknown,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 /** Restricted same-origin gateway. Supabase still enforces RLS using the visitor's token. */
 export async function cloudGateway(request:Request,fetcher:typeof fetch=fetch){
- const base=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+ const base=process.env.NEXT_PUBLIC_SUPABASE_URL,key=(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
  if(!base||!key)return reply({message:'Cloud setup is pending. Your device cabinet still works.'},503);
  const authorization=request.headers.get('authorization')||'';
  if(!/^Bearer [^\s]+$/.test(authorization))return reply({message:'Sign in to use cloud storage.'},401);
